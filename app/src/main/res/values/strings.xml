@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">final_finalapp</string>
+    <string name="play">play</string>
+    <string name="solve_puzzle">solve puzzles</string>
+    <string name="rankings">rankings</string>
+    <string name="matches">matches</string>
+    <string name="settings">settings</string>
+    <string name="chooseGameMode">choose game mode</string>
+    <string name="playVsBot">play vs bot</string>
+    <string name="playVsHuman">play vs human</string>
+    <string name="BotVsBot">bot vs bot</string>
+    <string name="back">back</string>
+</resources>
