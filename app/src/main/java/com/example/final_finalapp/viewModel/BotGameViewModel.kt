@@ -66,6 +66,10 @@ class BotGameViewModel @Inject constructor(
                 pieces.get(move.fromCol).set(move.fromRow, Piece.NONE)
 
                 pieces.get(move.toCol).set(move.toRow, piece)
+                gameSessionRepository.activeGame().firstOrNull()?.run {
+                    Log.d("Move that came in", move.toString())
+                    move(Move(move.fromRow, move.fromCol, move.toRow, move.toCol))
+                }
             }
         }
     }

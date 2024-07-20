@@ -47,7 +47,10 @@ fun Squares (
 
     val squareLabelStyleLight = remember { labelText.copy(color = boardColors.sqDark) }
     val squareLabelStyleDark = remember { labelText.copy(color = boardColors.sqLight) }
-    val fileLabels = listOf("1", "2", "3", "4", "5", "6", "7", "8")
+    val fileLabels = if (perspective == Side.WHITE)
+        listOf("8", "7", "6", "5", "4", "3", "2", "1")
+    else
+    listOf("1", "2", "3", "4", "5", "6", "7", "8")
     val rankLabels = listOf("a","b","c","d","e","f","g","h")
     Canvas(
         modifier

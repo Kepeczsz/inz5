@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ReusableContent
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import com.example.final_finalapp.game.Side
 import com.example.final_finalapp.game.composition.LocalBoardInteraction
@@ -15,7 +17,7 @@ fun ChessBoard(modifier: Modifier = Modifier,
                boardWidth: Float
 ){
     val boardInteraction = LocalBoardInteraction.current
-    val perspective = Side.WHITE
+    val perspective by boardInteraction.perspectiveChanges().collectAsState(boardInteraction.perspective())
 
     val boardLayout = rememberBoardLayout(
         perspective = perspective,
@@ -26,6 +28,7 @@ fun ChessBoard(modifier: Modifier = Modifier,
      boardInteraction.updateSquarePositions(boardLayout.squareSize)
     }
 
+    Log.d("Perspective", perspective.toString())
     ReusableContent(key = perspective) {
         Box(modifier = modifier) {
             boardLayout.run {
