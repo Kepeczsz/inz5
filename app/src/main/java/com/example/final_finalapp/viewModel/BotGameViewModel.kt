@@ -59,18 +59,10 @@ class BotGameViewModel @Inject constructor(
 
     fun onPlayerMove(move: Move) {
         intent {
-            val pieces = gameSessionRepository.activeGame().firstOrNull()?.pieces()
-            val piece = pieces?.get(move.fromCol)?.get(move.fromRow)
-
-            if (pieces != null && piece != null) {
-                pieces.get(move.fromCol).set(move.fromRow, Piece.NONE)
-
-                pieces.get(move.toCol).set(move.toRow, piece)
                 gameSessionRepository.activeGame().firstOrNull()?.run {
                     Log.d("Move that came in", move.toString())
                     move(Move(move.fromRow, move.fromCol, move.toRow, move.toCol))
                 }
-            }
         }
     }
 

@@ -8,67 +8,24 @@ enum class Piece(
     val fanSymbol: String,
     val fenSymbol: String
 ) {
-    /**
-     * White pawn piece.
-     */
     WHITE_PAWN(Side.WHITE, PieceType.PAWN, "♙", "P"),
-    /**
-     * White knight piece.
-     */
     WHITE_KNIGHT(Side.WHITE, PieceType.KNIGHT, "♘", "N"),
-    /**
-     * White bishop piece.
-     */
     WHITE_BISHOP(Side.WHITE, PieceType.BISHOP, "♗", "B"),
-    /**
-     * White rook piece.
-     */
     WHITE_ROOK(Side.WHITE, PieceType.ROOK, "♖", "R"),
-    /**
-     * White queen piece.
-     */
     WHITE_QUEEN(Side.WHITE, PieceType.QUEEN, "♕", "Q"),
-    /**
-     * White king piece.
-     */
     WHITE_KING(Side.WHITE, PieceType.KING, "♔", "K"),
-    /**
-     * Black pawn piece.
-     */
     BLACK_PAWN(Side.BLACK, PieceType.PAWN, "♟", "p"),
-    /**
-     * Black knight piece.
-     */
     BLACK_KNIGHT(Side.BLACK, PieceType.KNIGHT, "♞", "n"),
-    /**
-     * Black bishop piece.
-     */
     BLACK_BISHOP(Side.BLACK, PieceType.BISHOP, "♝", "b"),
-    /**
-     * Black rook piece.
-     */
     BLACK_ROOK(Side.BLACK, PieceType.ROOK, "♜", "r"),
-    /**
-     * Black queen piece.
-     */
     BLACK_QUEEN(Side.BLACK, PieceType.QUEEN, "♛", "q"),
-    /**
-     * Black king piece.
-     */
     BLACK_KING(Side.BLACK, PieceType.KING, "♚", "k"),
-
-    /**
-     *  Duck Piece
-     */
-
     DUCK(Side.NEUTRAL, PieceType.DUCK, "🐤", "d"),
-    /**
-     * None piece.
-     */
     NONE(null, null, "NONE", ".");
 
     companion object {
-        private val fenToPiece: MutableMap<String, Piece> = HashMap(13)
+
+        private val fenToPiece: MutableMap<String, Piece> = HashMap()
         val allPieces: Array<Piece> = values()
         private val pieceMake: Array<Array<Piece>> = arrayOf(
             arrayOf(WHITE_PAWN, BLACK_PAWN),
@@ -99,8 +56,6 @@ enum class Piece(
             return fenToPiece[fenSymbol]
                 ?: throw IllegalArgumentException(String.format("Unknown piece '%s'", fenSymbol))
         }
-
-
     }
 
     fun value(): String {
@@ -113,18 +68,5 @@ enum class Piece(
 
     fun getPieceSide(): Side? {
         return side
-    }
-
-
-    fun getSanSymbol(): String {
-        return type?.sanSymbol ?: ""
-    }
-
-    fun getFanSymbol1(): String {
-        return fanSymbol
-    }
-
-    fun getFenSymbol1(): String {
-        return fenSymbol
     }
 }

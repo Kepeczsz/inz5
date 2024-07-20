@@ -1,6 +1,7 @@
 package com.example.final_finalapp.game
 
 import android.util.Log
+import com.example.final_finalapp.game.chessBoard.CapturedPiece
 import com.example.final_finalapp.game.pieces.Piece
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,20 +29,9 @@ class GameManager {
         .flatMapLatest { it.moves() }
 
 
-    fun captures(): Flow<List<Piece>> = channelFlow<List<Piece>> {
-        sessionUpdates.collectLatest { session ->
-            if (session == null) {
-                send(emptyList())
-            } else {
-                send(session.captures())
-                session.moves().map {
-                    session.captures()
-                }.collectLatest {
-                    send(it)
-                }
-            }
-        }
-    }.distinctUntilChanged()
+    fun captures(): Flow<List<CapturedPiece>> = sessionUpdates
+        .filterNotNull()
+        .flatMapLatest { it.captureUpdates() }
 
 
     fun pieces(): Array<Array<Piece>> = sessionUpdates.value?.pieces() ?: emptyArray()

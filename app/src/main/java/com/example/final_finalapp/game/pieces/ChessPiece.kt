@@ -46,7 +46,7 @@ fun ChessPiece(initialState: ChessPieceState){
     var state by remember { mutableStateOf(initialState) }
     var dragging by remember { mutableStateOf(false) }
     var pan by remember { mutableStateOf(Offset.Zero) }
-
+    var isCaptured by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
         gameManager.moveUpdates()
@@ -55,6 +55,16 @@ fun ChessPiece(initialState: ChessPieceState){
                 pan = Offset.Zero
                 currentSize = squareSize
             }
+    }
+    LaunchedEffect(Unit) {
+
+        gameManager.captures().collectLatest { capturedPieces ->
+            isCaptured = capturedPieces.any { it.piece == state.piece && it.coordinates.first == state.squareCoordinates.row  && it.coordinates.second == state.squareCoordinates.col}
+            if (isCaptured) {
+
+            }
+            Log.d("lol", capturedPieces.toString())
+        }
     }
 
     val animatedSize by animateDpAsState(currentSize.toDp(), label = "Piece Size")
@@ -77,7 +87,7 @@ fun ChessPiece(initialState: ChessPieceState){
 
     val moving = animatedSize != currentSize.toDp() || animatedPan != position || dragging
 
-    if (state.captured) {
+    if (isCaptured) {
         return
     }
 

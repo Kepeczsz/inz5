@@ -2,6 +2,7 @@ package com.example.final_finalapp.game
 
 import android.util.Log
 import com.example.final_finalapp.game.chessBoard.Board
+import com.example.final_finalapp.game.chessBoard.CapturedPiece
 import com.example.final_finalapp.game.moves.Move
 import com.example.final_finalapp.game.pieces.Piece
 import kotlinx.coroutines.flow.Flow
@@ -17,7 +18,8 @@ open class GameRound(
     private lateinit var startPieces: Array<Array<Piece>>
     private lateinit var board: Board
     private val moves = MutableStateFlow<Move?>(null)
-    val history = listOf<Move>()
+    val history = mutableListOf<Move>()
+    private val capturedPieces = MutableStateFlow<List<CapturedPiece>>(emptyList())
     fun pieces(): Array<Array<Piece>> {
         return startPieces
     }
@@ -47,19 +49,24 @@ open class GameRound(
 
     open suspend fun move(move: Move): MoveResult {
         val piece = startPieces[move.fromRow][move.fromCol]
+        val targetPiece = startPieces[move.toRow][move.toCol]
 
-        if (startPieces[move.toRow][move.toCol] != Piece.NONE) {
+        if (targetPiece != Piece.NONE) {
             startPieces[move.toRow][move.toCol] = Piece.NONE
+            capturedPieces.value += CapturedPiece(targetPiece, Pair(move.toRow,move.toCol))
         }
 
         startPieces[move.fromRow][move.fromCol] = Piece.NONE
-
         startPieces[move.toRow][move.toCol] = piece
 
         Log.d("board:", getPieces())
+
+        history.add(move)
         moves.emit(move)
+        capturedPieces.emit(capturedPieces.value)
         return MoveResult.Moved
     }
+
     fun legalMoves() : List<Move> {
         Log.d("Legal moves", board.legalMoves(startPieces).toList().toString() )
        return  board.legalMoves(startPieces).toList()
@@ -70,5 +77,5 @@ open class GameRound(
      return   moves.filterNotNull()
     }
 
-
+    fun captureUpdates(): MutableStateFlow<List<CapturedPiece>> = capturedPieces
 }

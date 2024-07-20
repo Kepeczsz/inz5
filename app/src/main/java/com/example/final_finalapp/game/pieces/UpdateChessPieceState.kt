@@ -11,12 +11,10 @@ object UpdateChessPieceState {
         state: ChessPieceState,
         move: Move,
     ): ChessPieceState {
-
         val newState = state.copy()
 
-        move(move,state, newState, onNoChanges = { return state })
+        move(move, state, newState, onNoChanges = { return state })
         newState.squareOffset = newState.squareCoordinates.topLeft()
-
 
         return newState
     }
@@ -29,10 +27,13 @@ private inline fun move(
     newState: ChessPieceState,
     onNoChanges: () -> Unit,
 ) {
-    if(newState.piece != Piece.NONE && newState.piece.getPieceSide() != state.piece.getPieceSide()) {
-        newState.captured == true
+
+    if (newState.piece != Piece.NONE && newState.piece.getPieceSide() != state.piece.getPieceSide()) {
+
+        newState.captured = true
         newState.squareCoordinates.col = move.toCol
         newState.squareCoordinates.row = move.toRow
+
     }
     if (!state.captured) {
         if (move.fromCol == state.squareCoordinates.col && move.fromRow == state.squareCoordinates.row) {
