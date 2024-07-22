@@ -59,6 +59,16 @@ class Board {
                 when (piece) {
                     Piece.WHITE_PAWN -> moves.addAll(pawnMoves(startPieces, row, col, Side.WHITE))
                     Piece.BLACK_PAWN -> moves.addAll(pawnMoves(startPieces, row, col, Side.BLACK))
+                    Piece.WHITE_ROOK -> moves.addAll(rookMoves(startPieces, row, col, Side.WHITE))
+                    Piece.BLACK_ROOK -> moves.addAll(rookMoves(startPieces, row, col, Side.BLACK))
+                    Piece.WHITE_KNIGHT -> moves.addAll(knightMoves(startPieces, row, col, Side.WHITE))
+                    Piece.BLACK_KNIGHT -> moves.addAll(knightMoves(startPieces, row, col, Side.BLACK))
+                    Piece.WHITE_BISHOP -> moves.addAll(bishopMoves(startPieces, row, col, Side.WHITE))
+                    Piece.BLACK_BISHOP -> moves.addAll(bishopMoves(startPieces, row, col, Side.BLACK))
+                    Piece.WHITE_QUEEN -> moves.addAll(queenMoves(startPieces, row, col, Side.WHITE))
+                    Piece.BLACK_QUEEN -> moves.addAll(queenMoves(startPieces, row, col, Side.BLACK))
+                    Piece.WHITE_KING -> moves.addAll(kingMoves(startPieces, row, col, Side.WHITE))
+                    Piece.BLACK_KING -> moves.addAll(kingMoves(startPieces, row, col, Side.BLACK))
                     else -> {}
                 }
             }
@@ -89,7 +99,7 @@ class Board {
             val captureRow = row + direction
             if (isInBounds(captureRow, captureCol)) {
                 val targetPiece = board[captureRow][captureCol]
-                if (targetPiece != Piece.NONE && targetPiece.getPieceSide() != side) {
+                if (targetPiece != Piece.NONE && targetPiece != Piece.DUCK && targetPiece.getPieceSide() != side) {
                     moves.add(Move(row, col, captureRow, captureCol))
                 }
             }
@@ -97,6 +107,115 @@ class Board {
 
         return moves
     }
+
+
+    fun knightMoves(board: Array<Array<Piece>>, row: Int, col: Int, side: Side): List<Move> {
+        val moves = mutableListOf<Move>()
+        val directions = listOf(
+            Pair(-2, -1), Pair(-2, 1), Pair(-1, -2), Pair(-1, 2),
+            Pair(1, -2), Pair(1, 2), Pair(2, -1), Pair(2, 1)
+        )
+
+        for (direction in directions) {
+            val newRow = row + direction.first
+            val newCol = col + direction.second
+
+            if (isInBounds(newRow, newCol)) {
+                val targetPiece = board[newRow][newCol]
+                if (targetPiece == Piece.NONE || targetPiece.getPieceSide() != side) {
+                    moves.add(Move(row, col, newRow, newCol))
+                }
+            }
+        }
+
+        return moves
+    }
+
+    fun bishopMoves(board: Array<Array<Piece>>, row: Int, col: Int, side: Side): List<Move> {
+        val moves = mutableListOf<Move>()
+
+        val directions = listOf(Pair(-1, -1), Pair(-1, 1), Pair(1, -1), Pair(1, 1))
+
+        for (direction in directions) {
+            var newRow = row + direction.first
+            var newCol = col + direction.second
+
+            while (isInBounds(newRow, newCol)) {
+                val targetPiece = board[newRow][newCol]
+                if (targetPiece == Piece.NONE) {
+                    moves.add(Move(row, col, newRow, newCol))
+                } else {
+                    if (targetPiece.getPieceSide() != side) {
+                        moves.add(Move(row, col, newRow, newCol))
+                    }
+                    break
+                }
+                newRow += direction.first
+                newCol += direction.second
+            }
+        }
+
+        return moves
+    }
+
+    fun rookMoves(board: Array<Array<Piece>>, row: Int, col: Int, side: Side): List<Move> {
+        val moves = mutableListOf<Move>()
+
+        // Directions: up, down, left, right
+        val directions = listOf(Pair(-1, 0), Pair(1, 0), Pair(0, -1), Pair(0, 1))
+
+        for (direction in directions) {
+            var newRow = row + direction.first
+            var newCol = col + direction.second
+
+            while (isInBounds(newRow, newCol)) {
+                val targetPiece = board[newRow][newCol]
+                if (targetPiece == Piece.NONE) {
+                    moves.add(Move(row, col, newRow, newCol))
+                } else {
+                    if (targetPiece.getPieceSide() != side) {
+                        moves.add(Move(row, col, newRow, newCol))
+                    }
+                    break
+                }
+                newRow += direction.first
+                newCol += direction.second
+            }
+        }
+
+        return moves
+    }
+
+    fun queenMoves(board: Array<Array<Piece>>, row: Int, col: Int, side: Side): List<Move> {
+        val moves = mutableListOf<Move>()
+        moves.addAll(rookMoves(board, row, col, side))
+        moves.addAll(bishopMoves(board, row, col, side))
+        return moves
+    }
+
+    fun kingMoves(board: Array<Array<Piece>>, row: Int, col: Int, side: Side): List<Move> {
+        val moves = mutableListOf<Move>()
+        val directions = listOf(
+            Pair(-1, -1), Pair(-1, 0), Pair(-1, 1),
+            Pair(0, -1), /* King */ Pair(0, 1),
+            Pair(1, -1), Pair(1, 0), Pair(1, 1)
+        )
+
+        for (direction in directions) {
+            val newRow = row + direction.first
+            val newCol = col + direction.second
+
+            if (isInBounds(newRow, newCol)) {
+                val targetPiece = board[newRow][newCol]
+                if (targetPiece == Piece.NONE || targetPiece.getPieceSide() != side) {
+                    moves.add(Move(row, col, newRow, newCol))
+                }
+            }
+        }
+
+        return moves
+    }
+
 
     fun getCapturedPieces() {}
 }

@@ -20,6 +20,7 @@ open class GameRound(
     private val moves = MutableStateFlow<Move?>(null)
     val history = mutableListOf<Move>()
     private val capturedPieces = MutableStateFlow<List<CapturedPiece>>(emptyList())
+    var moveDuck : Boolean = false
     fun pieces(): Array<Array<Piece>> {
         return startPieces
     }

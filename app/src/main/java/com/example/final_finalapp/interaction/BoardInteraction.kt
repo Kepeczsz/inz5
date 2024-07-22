@@ -45,8 +45,11 @@ class BoardInteraction (
         if (enableInteraction) {
             var closest: Pair<SquareCoordinates, Float>? = null
             for (squareCoordinate in squareCoordinates) {
+
                 val (x1, y1) = squareCoordinate.offset
+
                 val (x2, y2) = position
+
                 val distance = sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))
 
                 if ((closest == null || distance < closest.second) && distance <= squareSizePx) {

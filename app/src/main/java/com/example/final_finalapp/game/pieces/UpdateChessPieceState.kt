@@ -29,11 +29,9 @@ private inline fun move(
 ) {
 
     if (newState.piece != Piece.NONE && newState.piece.getPieceSide() != state.piece.getPieceSide()) {
-
         newState.captured = true
         newState.squareCoordinates.col = move.toCol
         newState.squareCoordinates.row = move.toRow
-
     }
     if (!state.captured) {
         if (move.fromCol == state.squareCoordinates.col && move.fromRow == state.squareCoordinates.row) {
