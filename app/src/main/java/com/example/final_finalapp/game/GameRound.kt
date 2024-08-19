@@ -1,5 +1,6 @@
 package com.example.final_finalapp.game
 
+import android.annotation.SuppressLint
 import android.util.Log
 import com.example.final_finalapp.game.chessBoard.Board
 import com.example.final_finalapp.game.chessBoard.CapturedPiece
@@ -8,6 +9,7 @@ import com.example.final_finalapp.game.pieces.Piece
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 
 open class GameRound(
     val id: String = "",
@@ -20,7 +22,8 @@ open class GameRound(
     private val moves = MutableStateFlow<Move?>(null)
     val history = mutableListOf<Move>()
     private val capturedPieces = MutableStateFlow<List<CapturedPiece>>(emptyList())
-    var moveDuck : Boolean = false
+    private val terminationReason = MutableStateFlow<GameTerminationReason?>(null)
+
     fun pieces(): Array<Array<Piece>> {
         return startPieces
     }
@@ -49,23 +52,28 @@ open class GameRound(
     }
 
     open suspend fun move(move: Move): MoveResult {
-        val piece = startPieces[move.fromRow][move.fromCol]
-        val targetPiece = startPieces[move.toRow][move.toCol]
+        return if (termination() != null) {
+            MoveResult.GameEnded
+        } else {
+            val piece = startPieces[move.fromRow][move.fromCol]
+            val targetPiece = startPieces[move.toRow][move.toCol]
 
-        if (targetPiece != Piece.NONE) {
-            startPieces[move.toRow][move.toCol] = Piece.NONE
-            capturedPieces.value += CapturedPiece(targetPiece, Pair(move.toRow,move.toCol))
+            if (targetPiece != Piece.NONE) {
+                startPieces[move.toRow][move.toCol] = Piece.NONE
+                capturedPieces.value += CapturedPiece(targetPiece, Pair(move.toRow, move.toCol))
+                updateTermination(startPieces)
+            }
+
+            startPieces[move.fromRow][move.fromCol] = Piece.NONE
+            startPieces[move.toRow][move.toCol] = piece
+
+            Log.d("board:", getPieces())
+
+            history.add(move)
+            moves.emit(move)
+            capturedPieces.emit(capturedPieces.value)
+            return MoveResult.Moved
         }
-
-        startPieces[move.fromRow][move.fromCol] = Piece.NONE
-        startPieces[move.toRow][move.toCol] = piece
-
-        Log.d("board:", getPieces())
-
-        history.add(move)
-        moves.emit(move)
-        capturedPieces.emit(capturedPieces.value)
-        return MoveResult.Moved
     }
 
     fun legalMoves() : List<Move> {
@@ -77,6 +85,32 @@ open class GameRound(
         Log.d("GameRound", "moves() flow called")
      return   moves.filterNotNull()
     }
+    open suspend fun resign() {
+        terminationReason.emit(GameTerminationReason(resignation = selfSide))
+    }
+
+    fun termination(): GameTerminationReason? {
+        return terminationReason.value
+    }
+    suspend fun awaitTermination(): GameTerminationReason {
+        return terminationReason.filterNotNull().first()
+    }
 
     fun captureUpdates(): MutableStateFlow<List<CapturedPiece>> = capturedPieces
+
+    @SuppressLint("SuspiciousIndentation")
+    private fun updateTermination(pieces: Array<Array<Piece>>) {
+        // Check for legal moves for the current side
+        val legalMoves = board.legalMoves(pieces)
+
+            if (legalMoves.isEmpty()) {
+                terminationReason.tryEmit(
+                    GameTerminationReason(
+                        sideMated = Side.WHITE,
+                        draw = false,
+                    ),
+                )
+            }
+    }
+
 }

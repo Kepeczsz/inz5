@@ -1,6 +1,10 @@
 package com.example.final_finalapp.interaction
 
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import com.example.final_finalapp.PlayerTurn
 import com.example.final_finalapp.game.GameRound
@@ -25,7 +29,8 @@ class BoardInteraction (
     private var enableInteraction = true
     private val moves = MutableSharedFlow<Move>(replay = 1, extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     private val target = MutableStateFlow(SquareCoordinates(-1, -1, Offset.Zero) )
-    var currentTurn = session.selfSide
+    var currentTurn = Side.WHITE
+    var moveDuck  = mutableStateOf(false)
     fun updateSquarePositions(squareSizePx: Float) {
         this.squareSizePx = squareSizePx
         squareCoordinates.clear()
@@ -67,15 +72,26 @@ class BoardInteraction (
             if (target.value.row == -1 && target.value.col == -1) return DropPieceResult.None
 
             var result: DropPieceResult = DropPieceResult.None
+            if(moveDuck.value && piece == Piece.DUCK){
+                val move = Move(square.row, square.col, target.value.row, target.value.col)
+                if(move in session.legalMoves()) {
+                    moves.tryEmit(move)
+                    result = DropPieceResult.Moved(square, target.value)
+                }
+                moveDuck.value = false
+                currentTurn = currentTurn.flip()
+                return result
+            }
 
-            if ((currentTurn == Side.WHITE &&  piece.getPieceSide() == Side.WHITE) ||
+
+            if ((currentTurn == Side.WHITE && piece.getPieceSide() == Side.WHITE) ||
                 (currentTurn == Side.BLACK && piece.getPieceSide() == Side.BLACK)) {
                 Log.d("current turn", currentTurn.toString())
                 val move = Move(square.row, square.col, target.value.row, target.value.col)
                 if(move in session.legalMoves()) {
                     moves.tryEmit(move)
                     result = DropPieceResult.Moved(square, target.value)
-                    currentTurn = currentTurn.flip()
+                    moveDuck.value = true
                 }
                 releaseTarget()
             }

@@ -18,11 +18,11 @@ class Board {
                 Piece.WHITE_PAWN, Piece.WHITE_PAWN, Piece.WHITE_PAWN, Piece.WHITE_PAWN
             ),
             arrayOf(
-                Piece.NONE, Piece.DUCK, Piece.NONE, Piece.NONE,
+                Piece.NONE, Piece.NONE, Piece.NONE, Piece.NONE,
                 Piece.NONE, Piece.NONE, Piece.NONE, Piece.NONE
             ),
             arrayOf(
-                Piece.NONE, Piece.NONE, Piece.NONE, Piece.NONE,
+                Piece.NONE, Piece.DUCK, Piece.NONE, Piece.NONE,
                 Piece.NONE, Piece.NONE, Piece.NONE, Piece.NONE
             ),
             arrayOf(
@@ -69,6 +69,7 @@ class Board {
                     Piece.BLACK_QUEEN -> moves.addAll(queenMoves(startPieces, row, col, Side.BLACK))
                     Piece.WHITE_KING -> moves.addAll(kingMoves(startPieces, row, col, Side.WHITE))
                     Piece.BLACK_KING -> moves.addAll(kingMoves(startPieces, row, col, Side.BLACK))
+                    Piece.DUCK -> moves.addAll(duckMoves(startPieces, row, col))
                     else -> {}
                 }
             }
@@ -77,6 +78,19 @@ class Board {
         return moves
     }
 
+    fun duckMoves(board: Array<Array<Piece>>, currentRow: Int, currentCol: Int): List<Move> {
+        val validMoves = mutableListOf<Move>()
+
+        for (row in board.indices) {
+            for (col in board[row].indices) {
+                if (isInBounds(row, col) && board[row][col] == Piece.NONE) {
+                    validMoves.add(Move(currentRow, currentCol, row, col))
+                }
+            }
+        }
+
+        return validMoves
+    }
 
     fun pawnMoves(board: Array<Array<Piece>>, row: Int, col: Int, side: Side): List<Move> {
         val moves = mutableListOf<Move>()
@@ -197,8 +211,8 @@ class Board {
         val moves = mutableListOf<Move>()
         val directions = listOf(
             Pair(-1, -1), Pair(-1, 0), Pair(-1, 1),
-            Pair(0, -1), /* King */ Pair(0, 1),
-            Pair(1, -1), Pair(1, 0), Pair(1, 1)
+            Pair(0, -1),  Pair(0, 1),
+            Pair(1, -1),  Pair(1, 0), Pair(1, 1)
         )
 
         for (direction in directions) {
@@ -217,5 +231,13 @@ class Board {
     }
 
 
-    fun getCapturedPieces() {}
+    fun getCapturedPieces(board : List<CapturedPiece> ) : Side? {
+        for (row in board) {
+                if (row.piece == Piece.BLACK_KING)
+                    return Side.BLACK
+                if(row.piece == Piece.WHITE_KING)
+                    return Side.WHITE
+        }
+        return null
+    }
 }

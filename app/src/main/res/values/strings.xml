@@ -10,4 +10,13 @@
     <string name="playVsHuman">play vs human</string>
     <string name="BotVsBot">bot vs bot</string>
     <string name="back">back</string>
+    <string name="resign">poddaj sie</string>
+    <string name="confirm_resign">potwierdzam</string>
+    <string name="yes">tak</string>
+    <string name="no">nie</string>
+    <string name="restart">reset</string>
+    <string name="dismiss">odrzuc\n</string>
+    <string name="game_ended_by_draw">remis\n</string>
+    <string name="white_resigned">bialy sie poddal</string>
+    <string name="black_resigned">czarny kolor sie poddal</string>
 </resources>
