@@ -6,12 +6,13 @@ import com.example.final_finalapp.game.chessBoard.Board
 import com.example.final_finalapp.game.chessBoard.CapturedPiece
 import com.example.final_finalapp.game.moves.Move
 import com.example.final_finalapp.game.pieces.Piece
+import com.example.final_finalapp.game.pieces.PieceType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 
-open class GameRound(
+open class  GameRound(
     val id: String = "",
     val self: String = "Me",
     val opponent: String ="opponent",
@@ -61,7 +62,7 @@ open class GameRound(
             if (targetPiece != Piece.NONE) {
                 startPieces[move.toRow][move.toCol] = Piece.NONE
                 capturedPieces.value += CapturedPiece(targetPiece, Pair(move.toRow, move.toCol))
-                updateTermination(startPieces)
+                updateTermination(capturedPieces)
             }
 
             startPieces[move.fromRow][move.fromCol] = Piece.NONE
@@ -99,18 +100,26 @@ open class GameRound(
     fun captureUpdates(): MutableStateFlow<List<CapturedPiece>> = capturedPieces
 
     @SuppressLint("SuspiciousIndentation")
-    private fun updateTermination(pieces: Array<Array<Piece>>) {
-        // Check for legal moves for the current side
-        val legalMoves = board.legalMoves(pieces)
+    private fun updateTermination(capturedPiece: MutableStateFlow<List<CapturedPiece>>) {
+        val isCaptured = capturedPiece.value
 
-            if (legalMoves.isEmpty()) {
-                terminationReason.tryEmit(
-                    GameTerminationReason(
-                        sideMated = Side.WHITE,
-                        draw = false,
-                    ),
+        val whiteKingCaptured = isCaptured.any { it.piece.getPieceType() == PieceType.KING && it.piece.side == Side.WHITE }
+        val blackKingCaptured = isCaptured.any { it.piece.getPieceType() == PieceType.KING && it.piece.side == Side.BLACK }
+
+        if (whiteKingCaptured) {
+            terminationReason.tryEmit(
+                GameTerminationReason(
+                    sideMated = Side.WHITE,
+                    draw = false,
                 )
-            }
+            )
+        } else if (blackKingCaptured) {
+            terminationReason.tryEmit(
+                GameTerminationReason(
+                    sideMated = Side.BLACK,
+                    draw = false,
+                )
+            )
+        }
     }
-
 }
